@@ -22,6 +22,24 @@ var observer = new MutationObserver(function(mutations) {
         steps = editor.querySelectorAll('.workout-step')
         for(let i = 0; i < steps.length; i++) {
           console.log(steps[i])
+          //add button here
+          let div = document.createElement('div')
+          div.classList.add('step-component')
+          let clone = document.createElement('a')
+          clone.innerHTML = 'c'
+          div.append(clone)
+          clone.addEventListener('click', function() {
+            currStep = this.parentNode.parentNode
+            clonedStep = currStep.cloneNode(true)
+            console.log('clonedStep')
+            console.log(clonedStep)
+            currStep.parentNode.insertBefore(clonedStep, currStep.nextSibling)
+            
+            
+          })
+          steps[i].append(div)
+          
+          
         }
         console.log(editor) 
       }
