@@ -1,0 +1,42 @@
+// ==UserScript==
+// @name     Garmin Connect Workout
+// @namespace https://connect.garmin.com
+// @include https://connect.garmin.com/modern/workout/edit/*
+// @version  1
+// @grant    none
+// ==/UserScript==
+
+
+var observer = new MutationObserver(function(mutations) {
+  mutations.forEach(function(mutation) {
+    if (!mutation.addedNodes) return
+
+    for (var i = 0; i < mutation.addedNodes.length; i++) {
+      // do things to your newly added nodes here
+      
+      var node = mutation.addedNodes[i]
+      
+      if(node.classList.contains('workout-edit')) {
+        console.log(node)
+        editor = document.querySelector('.workout-editor')
+        steps = editor.querySelectorAll('.workout-step')
+        for(let i = 0; i < steps.length; i++) {
+          console.log(steps[i])
+        }
+        console.log(editor) 
+      }
+      
+      if(node.classList.contains('workout-step')) {
+        console.log(node) 
+      }
+    }
+  })
+})
+
+observer.observe(document.body, {
+    childList: true
+  , subtree: true
+  , attributes: false
+  , characterData: false
+})
+
