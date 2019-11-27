@@ -7,6 +7,8 @@
 // ==/UserScript==
 
 
+idList = []
+
 var observer = new MutationObserver(function(mutations) {
   mutations.forEach(function(mutation) {
     if (!mutation.addedNodes) return
@@ -17,11 +19,13 @@ var observer = new MutationObserver(function(mutations) {
       var node = mutation.addedNodes[i]
       
       if(node.classList.contains('workout-edit')) {
-        console.log(node)
-        editor = document.querySelector('.workout-editor')
-        steps = editor.querySelectorAll('.workout-step')
+        var editor = document.querySelector('.workout-editor')
+        var steps = editor.querySelectorAll('.workout-step')
         for(let i = 0; i < steps.length; i++) {
-          console.log(steps[i])
+          //console.log(steps[i])
+          //Add id
+          idList.push(getIdNum(steps[i]))
+          
           //add button here
           let div = document.createElement('div')
           div.classList.add('step-component')
@@ -29,12 +33,15 @@ var observer = new MutationObserver(function(mutations) {
           clone.innerHTML = 'c'
           div.append(clone)
           clone.addEventListener('click', function() {
-            currStep = this.parentNode.parentNode
-            clonedStep = currStep.cloneNode(true)
-            console.log('clonedStep')
+
+            let currStep = this.parentNode.parentNode
+            let clonedStep = currStep.cloneNode(true)
             console.log(clonedStep)
+            let newStepId = newId(clonedStep)
+            clonedStep.id = newStepId
             currStep.parentNode.insertBefore(clonedStep, currStep.nextSibling)
-            
+ 
+            enableSave()
             
           })
           steps[i].append(div)
@@ -45,7 +52,29 @@ var observer = new MutationObserver(function(mutations) {
       }
       
       if(node.classList.contains('workout-step')) {
-        console.log(node) 
+        //TODO FIX THIS
+        console.log('workout-step')
+        console.log(node)
+        let div = document.createElement('div')
+        div.classList.add('step-component')
+        let clone = document.createElement('a')
+        clone.innerHTML = 'c'
+        div.append(clone)
+        clone.addEventListener('click', function() {
+          //TODO separate out this element
+          //get id name of parent
+          //update clone with incremented id name
+          console.log('event listener')
+          let currStep = this.parentNode.parentNode
+          let clonedStep = currStep.cloneNode(true)
+          console.log(clonedStep)
+          let newStepId = newId(clonedStep)
+          clonedStep.id = newStepId
+          currStep.parentNode.insertBefore(clonedStep, currStep.nextSibling)
+          //TODO ungrey out save workout button
+          enableSave()
+       })
+       node.append(div)
       }
     }
   })
@@ -58,3 +87,37 @@ observer.observe(document.body, {
   , characterData: false
 })
 
+//observer.disconnect()
+
+function cloneButton(node) {
+  //Create div
+  let div = document.createElement('div')
+  div.classList.add('step-component')
+  let clone = document.createElement('a')
+  clone.innherHTML = 'c'
+  clone.id = newId(clone)
+  return div
+}
+
+function getIdNum(node) {
+  let num = (node.id).split('-')[2]
+  return parseInt(num)
+}
+
+function newId(node) {
+
+  var newid = getIdNum(node) + 1
+  console.log('newId')
+  while(idList.includes(newid)) {
+    console.log('increment')
+    newid += 1 
+  }
+  idList.push(newid)
+  let newidstr = "main-step-" + newid
+  return newidstr
+}
+
+function enableSave() {
+  var saveBtn = document.getElementById('save-workout')
+  saveBtn.classList.remove('disabled')
+}
