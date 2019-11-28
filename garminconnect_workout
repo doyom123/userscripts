@@ -6,6 +6,7 @@
 // @grant    none
 // ==/UserScript==
 
+//TODO Chaning run type breaks everything!
 
 idList = []
 
@@ -29,11 +30,13 @@ var observer = new MutationObserver(function(mutations) {
           //add button here
           let div = document.createElement('div')
           div.classList.add('step-component')
+         
           let clone = document.createElement('a')
+          clone.classList.add('cloneBtn')
           clone.innerHTML = 'c'
           div.append(clone)
-          clone.addEventListener('click', function() {
-
+          clone.onclick = function() {
+            console.log('event listener')
             let currStep = this.parentNode.parentNode
             let clonedStep = currStep.cloneNode(true)
             console.log(clonedStep)
@@ -42,8 +45,8 @@ var observer = new MutationObserver(function(mutations) {
             currStep.parentNode.insertBefore(clonedStep, currStep.nextSibling)
  
             enableSave()
-            
-          })
+           
+          }
           steps[i].append(div)
           
           
@@ -52,29 +55,22 @@ var observer = new MutationObserver(function(mutations) {
       }
       
       if(node.classList.contains('workout-step')) {
-        //TODO FIX THIS
+        idList.push(getIdNum(node))
         console.log('workout-step')
         console.log(node)
-        let div = document.createElement('div')
-        div.classList.add('step-component')
-        let clone = document.createElement('a')
-        clone.innerHTML = 'c'
-        div.append(clone)
-        clone.addEventListener('click', function() {
-          //TODO separate out this element
-          //get id name of parent
-          //update clone with incremented id name
-          console.log('event listener')
+        var cloneBtn = node.querySelector('.cloneBtn')
+        console.log(cloneBtn)
+        cloneBtn.onclick = function() {
+          console.log('clicked')
           let currStep = this.parentNode.parentNode
           let clonedStep = currStep.cloneNode(true)
-          console.log(clonedStep)
           let newStepId = newId(clonedStep)
           clonedStep.id = newStepId
           currStep.parentNode.insertBefore(clonedStep, currStep.nextSibling)
-          //TODO ungrey out save workout button
           enableSave()
-       })
-       node.append(div)
+          
+        }
+
       }
     }
   })
@@ -112,7 +108,6 @@ function newId(node) {
     console.log('increment')
     newid += 1 
   }
-  idList.push(newid)
   let newidstr = "main-step-" + newid
   return newidstr
 }
