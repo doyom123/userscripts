@@ -4,11 +4,33 @@
 // @include https://connect.garmin.com/modern/workout/edit/*
 // @version  1
 // @grant    none
+// @require https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js 
 // ==/UserScript==
 
 //TODO Chaning run type breaks everything!
 
 idList = []
+cloned = false
+workoutType = null
+workoutSelect = {
+  "workout-step-warm": 0,
+  "workout-step-run": 1,
+  "workout-step-recover": 2,
+  "workout-step-rest": 3,
+  "workout-step-cool": 4,
+  "workout-step-other": 5
+}
+
+durationSelect = {
+  1:"step-duration-time",
+  2:"step-duration-distance",
+  3:"step-duration-lap-button",
+  4:"step-duration-cal",
+  5:"step-duration-hr"
+}
+durationIdx = null
+durationTime = null
+durationUnit = null
 
 var observer = new MutationObserver(function(mutations) {
   mutations.forEach(function(mutation) {
@@ -28,8 +50,8 @@ var observer = new MutationObserver(function(mutations) {
           idList.push(getIdNum(steps[i]))
           
           //add button here
-          let div = document.createElement('div')
-          div.classList.add('step-component')
+          let div = document.createElement('span')
+          div.classList.add('pull-left')
          
           let clone = document.createElement('a')
           clone.classList.add('cloneBtn')
@@ -38,12 +60,27 @@ var observer = new MutationObserver(function(mutations) {
           clone.onclick = function() {
             console.log('event listener')
             let currStep = this.parentNode.parentNode
-            let clonedStep = currStep.cloneNode(true)
+            workoutType = currStep.classList[1]
+            console.log(workoutType)
+            
+            let duration = node.querySelector('.select-step-duration')
+            console.log('duration id = ' + duration.selectedIndex)
+            durationIdx = duration.selectedIndex
+            
+            
+            let clonedStep = $(currStep).clone(true, true)
             console.log(clonedStep)
-            let newStepId = newId(clonedStep)
-            clonedStep.id = newStepId
-            currStep.parentNode.insertBefore(clonedStep, currStep.nextSibling)
- 
+            //clonedStep.attr("id", newId(currStep))
+            var newStepBtn = document.getElementById('new-step')
+            newStepBtn.click()
+            console.log(newStepBtn)
+            //$(currStep).after(clonedStep)
+            //let clonedStep = currStep.cloneNode(true)
+          
+            //let newStepId = newId(clonedStep)
+            //clonedStep.id = newStepId
+            //currStep.parentNode.insertBefore(clonedStep, currStep.nextSibling)
+            console.log($._data($(currStep), "events"))
             enableSave()
            
           }
@@ -55,21 +92,22 @@ var observer = new MutationObserver(function(mutations) {
       }
       
       if(node.classList.contains('workout-step')) {
-        idList.push(getIdNum(node))
-        console.log('workout-step')
-        console.log(node)
-        var cloneBtn = node.querySelector('.cloneBtn')
-        console.log(cloneBtn)
-        cloneBtn.onclick = function() {
-          console.log('clicked')
-          let currStep = this.parentNode.parentNode
-          let clonedStep = currStep.cloneNode(true)
-          let newStepId = newId(clonedStep)
-          clonedStep.id = newStepId
-          currStep.parentNode.insertBefore(clonedStep, currStep.nextSibling)
-          enableSave()
-          
-        }
+        console.log("New node added")
+        //idList.push(getIdNum(node))
+
+
+        let prevWorkoutType = node.classList[1]
+        
+        node.classList.replace(prevWorkoutType, workoutType)
+        
+        let workoutIdx = workoutSelect[workoutType]
+        let stepType = node.querySelector('.select-step-type')
+        stepType.selectedIndex = workoutIdx
+        
+        //duration
+        let duration = node.querySelector('.select-step-duration')
+        duration.selectedIndex = durationIdx
+        duration.dispatchEvent(new Event('change', { bubbles: true }));
 
       }
     }
@@ -96,6 +134,7 @@ function cloneButton(node) {
 }
 
 function getIdNum(node) {
+  console.log('getIdNum')
   let num = (node.id).split('-')[2]
   return parseInt(num)
 }
@@ -109,6 +148,7 @@ function newId(node) {
     newid += 1 
   }
   let newidstr = "main-step-" + newid
+  console.log(newidstr)
   return newidstr
 }
 
