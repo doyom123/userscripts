@@ -7,7 +7,7 @@
 // @require https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js 
 // ==/UserScript==
 
-//TODO Chaning run type breaks everything!
+
 
 idList = []
 cloned = false
@@ -32,6 +32,11 @@ durationIdx = null
 durationTime = null
 durationUnit = null
 
+//#duration-distance
+durationValue = null
+durationOption = null
+
+
 var observer = new MutationObserver(function(mutations) {
   mutations.forEach(function(mutation) {
     if (!mutation.addedNodes) return
@@ -48,7 +53,7 @@ var observer = new MutationObserver(function(mutations) {
           //console.log(steps[i])
           //Add id
           idList.push(getIdNum(steps[i]))
-          
+
           //add button here
           let div = document.createElement('span')
           div.classList.add('pull-left')
@@ -57,15 +62,47 @@ var observer = new MutationObserver(function(mutations) {
           clone.classList.add('cloneBtn')
           clone.innerHTML = 'c'
           div.append(clone)
+          
           clone.onclick = function() {
             console.log('event listener')
             let currStep = this.parentNode.parentNode
             workoutType = currStep.classList[1]
             console.log(workoutType)
             
-            let duration = node.querySelector('.select-step-duration')
+            //TODO: change these to value instead of index
+            let duration = currStep.querySelector('.select-step-duration')
             console.log('duration id = ' + duration.selectedIndex)
             durationIdx = duration.selectedIndex
+            let durationDiv = currStep.querySelector('.step-duration')
+            switch(duration.value) {
+              case 'time':
+                durationValue = durationDiv.querySelector('input[name="duration-time"]').value
+                durationOption = null
+                break
+              case 'distance':
+                durationValue = durationDiv.querySelector('input[name="duration-distance"]').value
+                console.log('dist')
+                durationOption = durationDiv.querySelector('select[name="distanceUnit"]').value
+  
+                break
+              case 'lap.button':
+                durationValue = null
+                durationOption = null
+                break
+              case 'calories':
+                durationValue = durationDiv.querySelector('input[name="duration-calories"]').value
+                durationOption = null
+                break
+              case 'heart.rate.zone':
+                durationOption = durationDiv.querySelector('select[name="heart-rate-select"]').value
+                durationValue = durationDiv.querySelector('input[name="duration-heart-rate-custom"]').value
+                break
+              default:
+                durationValue = null
+                durationOption = null
+                break
+            }
+
             
             
             let clonedStep = $(currStep).clone(true, true)
@@ -108,7 +145,28 @@ var observer = new MutationObserver(function(mutations) {
         let duration = node.querySelector('.select-step-duration')
         duration.selectedIndex = durationIdx
         duration.dispatchEvent(new Event('change', { bubbles: true }));
-
+        let durationDiv = node.querySelector('.step-duration')
+        console.log('durationvalue ' + duration.value)
+        switch(duration.value) {
+          case 'time':
+            durationDiv.querySelector('input[name="duration-time"]').value = durationValue
+            break
+          case 'distance':
+            durationDiv.querySelector('input[name="duration-distance"]').value = durationValue
+            durationDiv.querySelector('select[name="distanceUnit"]').value = durationOption
+            break
+          case 'lap.button':
+            break
+          case 'calories':
+            durationDiv.querySelector('input[name="duration-calories"]').value = durationValue
+            break
+          case 'heart.rate.zone':
+            durationDiv.querySelector('select[name="heart-rate-select"]').value = durationOption
+            durationDiv.querySelector('input[name="duration-heart-rate-custom"]').value = durationValue
+            break
+          default:
+            break
+        }
       }
     }
   })
