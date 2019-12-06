@@ -7,7 +7,16 @@
 // @require https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js 
 // ==/UserScript==
 
-
+var style = document.createElement('style')
+style.innerHTML = `
+#cloneBtn {
+  float: left;
+  position: relative;
+  margin-left: 2%;
+  margin-top: 1%;
+  cursor: pointer;
+}`;
+document.head.appendChild(style)
 
 idList = []
 cloned = false
@@ -44,30 +53,15 @@ targetValue = null
 targetFrom = null
 targetTo = null
 
-var observer = new MutationObserver(function(mutations) {
-  mutations.forEach(function(mutation) {
-    if (!mutation.addedNodes) return
-
-    for (var i = 0; i < mutation.addedNodes.length; i++) {
-      // do things to your newly added nodes here
-      
-      var node = mutation.addedNodes[i]
-      
-      if(node.classList.contains('workout-edit')) {
-        var editor = document.querySelector('.workout-editor')
-        var steps = editor.querySelectorAll('.workout-step')
-        for(let i = 0; i < steps.length; i++) {
-          //console.log(steps[i])
-          //Add id
-          idList.push(getIdNum(steps[i]))
-
-          //add button here
-          let div = document.createElement('span')
-          div.classList.add('pull-left')
+function createCloneBtn() {
+          var div = document.createElement('span')
+          div.setAttribute('id', 'cloneBtn')
+          div.setAttribute('class', 'has-tooltip')
+          //div.classList.add('pull-left')
          
           let clone = document.createElement('a')
           clone.classList.add('cloneBtn')
-          clone.innerHTML = 'c'
+          clone.innerHTML = '+'
           div.append(clone)
           
           clone.onclick = function() {
@@ -155,10 +149,8 @@ var observer = new MutationObserver(function(mutations) {
             }
             
             
-            let clonedStep = $(currStep).clone(true, true)
-
             //clonedStep.attr("id", newId(currStep))
-            var newStepBtn = document.getElementById('new-step')
+            var newStepBtn = document.querySelector('#new-step')
             newStepBtn.click()
 
             //$(currStep).after(clonedStep)
@@ -171,7 +163,27 @@ var observer = new MutationObserver(function(mutations) {
             enableSave()
            
           }
-          steps[i].append(div)
+          return div
+}
+
+var observer = new MutationObserver(function(mutations) {
+  mutations.forEach(function(mutation) {
+    if (!mutation.addedNodes) return
+
+    for (var i = 0; i < mutation.addedNodes.length; i++) {
+      // do things to your newly added nodes here
+      
+      var node = mutation.addedNodes[i]
+      
+      if(node.classList.contains('workout-edit')) {
+        var editor = document.querySelector('.workout-editor')
+        var steps = editor.querySelectorAll('.workout-step')
+        for(let i = 0; i < steps.length; i++) {
+          //console.log(steps[i])
+          //Add id
+          //add button here
+          let div = createCloneBtn()
+          steps[i].prepend(div)
           
           
         }
@@ -294,9 +306,15 @@ var observer = new MutationObserver(function(mutations) {
           } break
           default:
             break
-        }       
+        }
+        // Add clone button
+        let div = createCloneBtn()
+        node.prepend(div)
+        
       }
       targetExists = false
+      
+      
     }
   })
 })
