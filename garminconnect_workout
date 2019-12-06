@@ -113,27 +113,32 @@ var observer = new MutationObserver(function(mutations) {
             var stepTargetSelect = currStep.querySelector('.select-step-target')
             stepTargetValue = stepTargetSelect.value
             stepTargetIdx = stepTargetSelect.selectedIndex
+            console.log('stepTargetIdx ' + stepTargetIdx)
             var stepTargetDiv = currStep.querySelector('.step-target')
             addMore = currStep.querySelector('#add-step-target')
             if(addMore.classList.contains('hide') && stepTargetSelect.value != 'no.target') {
-              console.log('target')
+
               targetValue = stepTargetSelect.value
-              console.log('target value: ' + targetValue)
+ 
               switch(targetValue) {
                 case 'pace.zone':
-                  console.log('pace.zone')
+                  targetExists = true
+                  //console.log('pace.zone')
                   targetFrom = stepTargetDiv.querySelector('input[name="target-pace-from"]').value
                   targetTo = stepTargetDiv.querySelector('input[name="target-pace-to"]').value
                   break
                 case 'speed.zone':
+                  targetExists = true
                   targetFrom = stepTargetDiv.querySelector('input[name="target-speed-from"]').value
                   targetTo = stepTargetDiv.querySelector('input[name="target-speed-to"]').value
                   break
                 case 'cadence':
+                  targetExists = true
                   targetFrom = stepTargetDiv.querySelector('input[name="target-cadence-from"]').value
                   targetTo = stepTargetDiv.querySelector('input[name="target-cadence-to"]').value
                   break
                 case 'heart.rate.zone':
+                  targetExists = true
                   heartRateIdx = stepTargetSelect.selectedIndex
                   
                   if(heartRateIdx == 9) {
@@ -142,6 +147,7 @@ var observer = new MutationObserver(function(mutations) {
                   }
                   break
                 default:
+                  targetExists = false
                   break
               }
             } else {
@@ -173,7 +179,6 @@ var observer = new MutationObserver(function(mutations) {
       }
       
       if(node.classList.contains('workout-step')) {
-        console.log("New node added")
         let prevWorkoutType = node.classList[1]
         
         node.classList.replace(prevWorkoutType, workoutType)
@@ -182,7 +187,6 @@ var observer = new MutationObserver(function(mutations) {
         let stepType = node.querySelector('.select-step-type')
         stepType.selectedIndex = workoutIdx
         
-        //duration
         let duration = node.querySelector('.select-step-duration')
         duration.selectedIndex = durationIdx
         duration.dispatchEvent(new Event('change', { bubbles: true }))
@@ -224,21 +228,33 @@ var observer = new MutationObserver(function(mutations) {
             break
         }
         
+        // click addmore
         var stepTargetSelect = node.querySelector('.select-step-target')
-        stepTargetSelect.selectedIndex = stepTargetIdx
+        
+        console.log('new clone: stepTargetIdx ' + stepTargetIdx)
         var stepTargetDiv = node.querySelector('.step-target')
-        //stepTargetDiv.dispatchEvent(new Event('change', { bubbles: true }));
-        stepTargetSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        
 
+        
+        if(targetExists == true) {
+           let addMore = node.querySelector('#add-step-target')
+           addMore.click()
+        }
+        stepTargetSelect.selectedIndex = stepTargetIdx
+        stepTargetSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        stepTargetDiv.dispatchEvent(new Event('change', { bubbles: true }));
         let targetValue = stepTargetSelect.value 
         switch(targetValue) {
           case 'pace.zone': {
-            console.log('pace.zone')
+
             let inputFrom = stepTargetDiv.querySelector('input[name="target-pace-from"]')
+            console.log('pace.zone')
             inputFrom.value = targetFrom
+            console.log('iv ' + inputFrom.value)
             inputFrom.dispatchEvent(new Event('change', { bubbles: true }))
             let inputTo = stepTargetDiv.querySelector('input[name="target-pace-to"]')
             inputTo.value = targetTo
+            console.log('it ' + inputTo.value)
             inputTo.dispatchEvent(new Event('change', { bubbles: true }))
             console.log('finished')
           } break
@@ -263,7 +279,7 @@ var observer = new MutationObserver(function(mutations) {
             console.log('finished')            
           } break
           case 'heart.rate.zone': {
-            heartRateIdx = stepTargetSelect.selectedIndex
+            console.log('hearratezone')
             
             if(heartRateIdx == 9) {
               let inputFrom = stepTargetDiv.querySelector('input[name="target-heart-rate-custom-from"]')
@@ -280,6 +296,7 @@ var observer = new MutationObserver(function(mutations) {
             break
         }       
       }
+      targetExists = false
     }
   })
 })
