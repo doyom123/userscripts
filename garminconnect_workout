@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name     Garmin Connect Workout
 // @namespace https://connect.garmin.com
+// @author Do Om
 // @include https://connect.garmin.com/modern/workout/*
 // @include https://connect.garmin.com/modern/workout/edit/*
 // @version  1.0
