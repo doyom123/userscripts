@@ -2,9 +2,9 @@
 // @name     Garmin Connect Workout
 // @namespace https://connect.garmin.com
 // @include https://connect.garmin.com/modern/workout/*
+// @include https://connect.garmin.com/modern/workout/edit/*
 // @version  1
 // @grant    none
-// @require https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js 
 // ==/UserScript==
 
 var style = document.createElement('style')
@@ -158,20 +158,27 @@ function createCloneBtn() {
 
 var observer = new MutationObserver(function(mutations) {
   mutations.forEach(function(mutation) {
-    if (!mutation.addedNodes) return
+    
+      if(mutation.target.classList.contains('workout-edit')) {
+      //if (!mutation.addedNodes) return
+      var steps = mutation.target.querySelectorAll('.workout-step')
+    
+    
+      for (var i = 0; i < steps.length; i++) {
+       var node = steps[i]
+      
+       if(node.querySelector('#cloneBtn') == null) {
+          node.prepend(createCloneBtn())
+        }
+      }     
+    }
+    
 
+    
+    console.log(mutation)
     for (var i = 0; i < mutation.addedNodes.length; i++) {
       var node = mutation.addedNodes[i]
-      
-      if(node.classList.contains('workout-edit')) {
-        var editor = document.querySelector('.workout-editor')
-        var steps = editor.querySelectorAll('.workout-step')
-        for(let i = 0; i < steps.length; i++) {
-          let div = createCloneBtn()
-          steps[i].prepend(div)
-        }
-        console.log(editor) 
-      }
+      console.log('added_node')
       
       if(node.classList.contains('workout-step') && cloned == true) {
         let workoutIdx = workoutSelect[workoutType]
@@ -294,3 +301,6 @@ observer.observe(document.body, {
 })
 
 //observer.disconnect()
+
+
+
