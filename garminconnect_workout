@@ -3,7 +3,7 @@
 // @namespace https://connect.garmin.com
 // @include https://connect.garmin.com/modern/workout/*
 // @include https://connect.garmin.com/modern/workout/edit/*
-// @version  1
+// @version  1.0
 // @grant    none
 // ==/UserScript==
 
@@ -54,106 +54,102 @@ targetFrom = null
 targetTo = null
 
 function createCloneBtn() {
-          var div = document.createElement('span')
-          div.setAttribute('id', 'cloneBtn')
-          div.setAttribute('class', 'has-tooltip')
-          //div.classList.add('pull-left')
-         
-          let clone = document.createElement('a')
-          clone.classList.add('cloneBtn')
-          clone.innerHTML = '+'
-          div.append(clone)
-          
-          clone.onclick = function() {
-            cloned = true
-            console.log('event listener')
-            let currStep = this.parentNode.parentNode
-            workoutType = currStep.classList[1]
-            console.log(workoutType)
-            
-            //TODO: change these to value instead of index
-            let duration = currStep.querySelector('.select-step-duration')
-            console.log('duration id = ' + duration.selectedIndex)
-            durationIdx = duration.selectedIndex
-            let durationDiv = currStep.querySelector('.step-duration')
-            switch(duration.value) {
-              case 'time':
-                durationValue = durationDiv.querySelector('input[name="duration-time"]').value
-                durationOption = null
-                break
-              case 'distance':
-                durationValue = durationDiv.querySelector('input[name="duration-distance"]').value
-                console.log('dist')
-                durationOption = durationDiv.querySelector('select[name="distanceUnit"]').value
-  
-                break
-              case 'lap.button':
-                durationValue = null
-                durationOption = null
-                break
-              case 'calories':
-                durationValue = durationDiv.querySelector('input[name="duration-calories"]').value
-                durationOption = null
-                break
-              case 'heart.rate.zone':
-                durationOption = durationDiv.querySelector('select[name="heart-rate-select"]').value
-                durationValue = durationDiv.querySelector('input[name="duration-heart-rate-custom"]').value
-                break
-              default:
-                durationValue = null
-                durationOption = null
-                break
-            }
-            
-            var stepTargetSelect = currStep.querySelector('.select-step-target')
-            stepTargetValue = stepTargetSelect.value
-            stepTargetIdx = stepTargetSelect.selectedIndex
-            
-            var stepTargetDiv = currStep.querySelector('.step-target')
-            addMore = currStep.querySelector('#add-step-target')
-            if(addMore.classList.contains('hide') && stepTargetSelect.value != 'no.target') {
-
-              targetValue = stepTargetSelect.value
+  var div = document.createElement('span')
+  div.setAttribute('id', 'cloneBtn')
+  div.setAttribute('class', 'has-tooltip')
+  //div.classList.add('pull-left')
  
-              switch(targetValue) {
-                case 'pace.zone':
-                  targetExists = true
-                  //console.log('pace.zone')
-                  targetFrom = stepTargetDiv.querySelector('input[name="target-pace-from"]').value
-                  targetTo = stepTargetDiv.querySelector('input[name="target-pace-to"]').value
-                  break
-                case 'speed.zone':
-                  targetExists = true
-                  targetFrom = stepTargetDiv.querySelector('input[name="target-speed-from"]').value
-                  targetTo = stepTargetDiv.querySelector('input[name="target-speed-to"]').value
-                  break
-                case 'cadence':
-                  targetExists = true
-                  targetFrom = stepTargetDiv.querySelector('input[name="target-cadence-from"]').value
-                  targetTo = stepTargetDiv.querySelector('input[name="target-cadence-to"]').value
-                  break
-                case 'heart.rate.zone':
-                  targetExists = true
-                  heartRateIdx = stepTargetSelect.selectedIndex
-                  
-                  if(heartRateIdx == 9) {
-                    targetFrom = stepTargetDiv.querySelector('input[name="target-heart-rate-custom-from"]').value
-                    targetTo = stepTargetDiv.querySelector('input[name="target-heart-rate-custom-to"]').value
-                  }
-                  break
-                default:
-                  targetExists = false
-                  break
-              }
-            } else {
-              //console.log('nottarget')
-            }
-            
-            var newStepBtn = document.querySelector('#new-step')
-            newStepBtn.click()
-           
+  let clone = document.createElement('a')
+  clone.classList.add('cloneBtn')
+  clone.innerHTML = '+'
+  div.append(clone)
+  
+  clone.onclick = function() {
+    cloned = true
+    let currStep = this.parentNode.parentNode
+    workoutType = currStep.classList[1]
+    
+    //TODO: change these to value instead of index
+    let duration = currStep.querySelector('.select-step-duration')
+    durationIdx = duration.selectedIndex
+    let durationDiv = currStep.querySelector('.step-duration')
+    switch(duration.value) {
+      case 'time':
+        durationValue = durationDiv.querySelector('input[name="duration-time"]').value
+        durationOption = null
+        break
+      case 'distance':
+        durationValue = durationDiv.querySelector('input[name="duration-distance"]').value
+        durationOption = durationDiv.querySelector('select[name="distanceUnit"]').value
+
+        break
+      case 'lap.button':
+        durationValue = null
+        durationOption = null
+        break
+      case 'calories':
+        durationValue = durationDiv.querySelector('input[name="duration-calories"]').value
+        durationOption = null
+        break
+      case 'heart.rate.zone':
+        durationOption = durationDiv.querySelector('select[name="heart-rate-select"]').value
+        durationValue = durationDiv.querySelector('input[name="duration-heart-rate-custom"]').value
+        break
+      default:
+        durationValue = null
+        durationOption = null
+        break
+    }
+    
+    var stepTargetSelect = currStep.querySelector('.select-step-target')
+    stepTargetValue = stepTargetSelect.value
+    stepTargetIdx = stepTargetSelect.selectedIndex
+    
+    var stepTargetDiv = currStep.querySelector('.step-target')
+    addMore = currStep.querySelector('#add-step-target')
+    if(addMore.classList.contains('hide') && stepTargetSelect.value != 'no.target') {
+
+      targetValue = stepTargetSelect.value
+
+      switch(targetValue) {
+        case 'pace.zone':
+          targetExists = true
+          //console.log('pace.zone')
+          targetFrom = stepTargetDiv.querySelector('input[name="target-pace-from"]').value
+          targetTo = stepTargetDiv.querySelector('input[name="target-pace-to"]').value
+          break
+        case 'speed.zone':
+          targetExists = true
+          targetFrom = stepTargetDiv.querySelector('input[name="target-speed-from"]').value
+          targetTo = stepTargetDiv.querySelector('input[name="target-speed-to"]').value
+          break
+        case 'cadence':
+          targetExists = true
+          targetFrom = stepTargetDiv.querySelector('input[name="target-cadence-from"]').value
+          targetTo = stepTargetDiv.querySelector('input[name="target-cadence-to"]').value
+          break
+        case 'heart.rate.zone':
+          targetExists = true
+          heartRateIdx = stepTargetSelect.selectedIndex
+          
+          if(heartRateIdx == 9) {
+            targetFrom = stepTargetDiv.querySelector('input[name="target-heart-rate-custom-from"]').value
+            targetTo = stepTargetDiv.querySelector('input[name="target-heart-rate-custom-to"]').value
           }
-          return div
+          break
+        default:
+          targetExists = false
+          break
+      }
+    } else {
+      //console.log('nottarget')
+    }
+    
+    var newStepBtn = document.querySelector('#new-step')
+    newStepBtn.click()
+   
+  }
+  return div
 }
 
 var observer = new MutationObserver(function(mutations) {
@@ -171,14 +167,12 @@ var observer = new MutationObserver(function(mutations) {
           node.prepend(createCloneBtn())
         }
       }     
-    }
+  }
     
 
     
-    console.log(mutation)
     for (var i = 0; i < mutation.addedNodes.length; i++) {
       var node = mutation.addedNodes[i]
-      console.log('added_node')
       
       if(node.classList.contains('workout-step') && cloned == true) {
         let workoutIdx = workoutSelect[workoutType]
@@ -242,7 +236,6 @@ var observer = new MutationObserver(function(mutations) {
         switch(targetValue) {
           case 'pace.zone': {
             let inputFrom = stepTargetDiv.querySelector('input[name="target-pace-from"]')
-            console.log('pace.zone')
             inputFrom.value = targetFrom
             inputFrom.dispatchEvent(new Event('change', { bubbles: true }))
             let inputTo = stepTargetDiv.querySelector('input[name="target-pace-to"]')
