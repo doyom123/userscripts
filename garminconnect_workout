@@ -12,8 +12,8 @@ style.innerHTML = `
 #cloneBtn {
   float: left;
   position: relative;
-  margin-left: 2%;
-  margin-top: 1%;
+  margin-left: 6px;
+  margin-top: 1px%;
   cursor: pointer;
 }`;
 document.head.appendChild(style)
@@ -65,6 +65,7 @@ function createCloneBtn() {
           div.append(clone)
           
           clone.onclick = function() {
+            cloned = true
             console.log('event listener')
             let currStep = this.parentNode.parentNode
             workoutType = currStep.classList[1]
@@ -107,7 +108,7 @@ function createCloneBtn() {
             var stepTargetSelect = currStep.querySelector('.select-step-target')
             stepTargetValue = stepTargetSelect.value
             stepTargetIdx = stepTargetSelect.selectedIndex
-            console.log('stepTargetIdx ' + stepTargetIdx)
+            
             var stepTargetDiv = currStep.querySelector('.step-target')
             addMore = currStep.querySelector('#add-step-target')
             if(addMore.classList.contains('hide') && stepTargetSelect.value != 'no.target') {
@@ -145,22 +146,11 @@ function createCloneBtn() {
                   break
               }
             } else {
-              console.log('nottarget')
+              //console.log('nottarget')
             }
             
-            
-            //clonedStep.attr("id", newId(currStep))
             var newStepBtn = document.querySelector('#new-step')
             newStepBtn.click()
-
-            //$(currStep).after(clonedStep)
-            //let clonedStep = currStep.cloneNode(true)
-          
-            //let newStepId = newId(clonedStep)
-            //clonedStep.id = newStepId
-            //currStep.parentNode.insertBefore(clonedStep, currStep.nextSibling)
-
-            enableSave()
            
           }
           return div
@@ -171,33 +161,24 @@ var observer = new MutationObserver(function(mutations) {
     if (!mutation.addedNodes) return
 
     for (var i = 0; i < mutation.addedNodes.length; i++) {
-      // do things to your newly added nodes here
-      
       var node = mutation.addedNodes[i]
       
       if(node.classList.contains('workout-edit')) {
         var editor = document.querySelector('.workout-editor')
         var steps = editor.querySelectorAll('.workout-step')
         for(let i = 0; i < steps.length; i++) {
-          //console.log(steps[i])
-          //Add id
-          //add button here
           let div = createCloneBtn()
           steps[i].prepend(div)
-          
-          
         }
         console.log(editor) 
       }
       
-      if(node.classList.contains('workout-step')) {
-        let prevWorkoutType = node.classList[1]
-        
-        node.classList.replace(prevWorkoutType, workoutType)
-        
+      if(node.classList.contains('workout-step') && cloned == true) {
         let workoutIdx = workoutSelect[workoutType]
         let stepType = node.querySelector('.select-step-type')
         stepType.selectedIndex = workoutIdx
+        stepType.dispatchEvent(new Event('change', { bubbles: true }))
+        let stepDefine = node.querySelector('.step-define')
         
         let duration = node.querySelector('.select-step-duration')
         duration.selectedIndex = durationIdx
@@ -218,7 +199,6 @@ var observer = new MutationObserver(function(mutations) {
             let option = durationDiv.querySelector('select[name="distanceUnit"]') 
             option.value = durationOption
             option.dispatchEvent(new Event('change', { bubbles: true }))
-            console.log('event dispatched')
           } break
           case 'lap.button':
             break
@@ -231,7 +211,7 @@ var observer = new MutationObserver(function(mutations) {
             let option = durationDiv.querySelector('select[name="heart-rate-select"]')
             option.value = durationOption
             option.dispatchEvent(new Event('change', { bubbles: true }))
-            console.log('event dispatched')
+
             let input = durationDiv.querySelector('input[name="duration-heart-rate-custom"]')
             input.value = durationValue
             input.dispatchEvent(new Event('change', { bubbles: true }))
@@ -240,13 +220,9 @@ var observer = new MutationObserver(function(mutations) {
             break
         }
         
-        // click addmore
         var stepTargetSelect = node.querySelector('.select-step-target')
         
-        console.log('new clone: stepTargetIdx ' + stepTargetIdx)
         var stepTargetDiv = node.querySelector('.step-target')
-        
-
         
         if(targetExists == true) {
            let addMore = node.querySelector('#add-step-target')
@@ -258,17 +234,13 @@ var observer = new MutationObserver(function(mutations) {
         let targetValue = stepTargetSelect.value 
         switch(targetValue) {
           case 'pace.zone': {
-
             let inputFrom = stepTargetDiv.querySelector('input[name="target-pace-from"]')
             console.log('pace.zone')
             inputFrom.value = targetFrom
-            console.log('iv ' + inputFrom.value)
             inputFrom.dispatchEvent(new Event('change', { bubbles: true }))
             let inputTo = stepTargetDiv.querySelector('input[name="target-pace-to"]')
             inputTo.value = targetTo
-            console.log('it ' + inputTo.value)
             inputTo.dispatchEvent(new Event('change', { bubbles: true }))
-            console.log('finished')
           } break
           case 'speed.zone': {
             let inputFrom = stepTargetDiv.querySelector('input[name="target-speed-from"]')
@@ -278,7 +250,6 @@ var observer = new MutationObserver(function(mutations) {
             let inputTo = stepTargetDiv.querySelector('input[name="target-speed-to"]')
             inputTo.value = targetTo
             inputTo.dispatchEvent(new Event('change', { bubbles: true }))
-            console.log('finished')
           } break
           case 'cadence': {
             let inputFrom = stepTargetDiv.querySelector('input[name="target-cadence-from"]')
@@ -288,11 +259,8 @@ var observer = new MutationObserver(function(mutations) {
             let inputTo = stepTargetDiv.querySelector('input[name="target-cadence-to"]')
             inputTo.value = targetTo
             inputTo.dispatchEvent(new Event('change', { bubbles: true }))
-            console.log('finished')            
           } break
           case 'heart.rate.zone': {
-            console.log('hearratezone')
-            
             if(heartRateIdx == 9) {
               let inputFrom = stepTargetDiv.querySelector('input[name="target-heart-rate-custom-from"]')
               inputFrom.value = targetFrom
@@ -301,7 +269,6 @@ var observer = new MutationObserver(function(mutations) {
               let inputTo = stepTargetDiv.querySelector('input[name="target-heart-rate-custom-to"]')
               inputTo.value = targetTo
               inputTo.dispatchEvent(new Event('change', { bubbles: true }))
-              console.log('finished')    
             }
           } break
           default:
@@ -313,7 +280,7 @@ var observer = new MutationObserver(function(mutations) {
         
       }
       targetExists = false
-      
+      cloned = false
       
     }
   })
@@ -327,37 +294,3 @@ observer.observe(document.body, {
 })
 
 //observer.disconnect()
-
-function cloneButton(node) {
-  //Create div
-  let div = document.createElement('div')
-  div.classList.add('step-component')
-  let clone = document.createElement('a')
-  clone.innherHTML = 'c'
-  clone.id = newId(clone)
-  return div
-}
-
-function getIdNum(node) {
-  console.log('getIdNum')
-  let num = (node.id).split('-')[2]
-  return parseInt(num)
-}
-
-function newId(node) {
-
-  var newid = getIdNum(node) + 1
-  console.log('newId')
-  while(idList.includes(newid)) {
-    console.log('increment')
-    newid += 1 
-  }
-  let newidstr = "main-step-" + newid
-  console.log(newidstr)
-  return newidstr
-}
-
-function enableSave() {
-  var saveBtn = document.getElementById('save-workout')
-  saveBtn.classList.remove('disabled')
-}
